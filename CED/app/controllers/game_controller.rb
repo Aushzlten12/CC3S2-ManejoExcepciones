@@ -24,7 +24,7 @@ class GameController < ApplicationController
       if ! @game.guess(letter[0])
         flash[:message] = "You have already used that letter." 
       end
-    rescue ArgumentError
+    rescue InvalidGuessError
       flash[:message] = "Invalid guess."
     end
     redirect_to game_path

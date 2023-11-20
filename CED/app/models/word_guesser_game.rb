@@ -1,3 +1,13 @@
+# Create my own ApplicationError hierarchy
+
+class ApplicationError < StandardError; end
+
+class ValidationError < ApplicationError; end
+class InvalidGuessError < ValidationError; end
+
+class ResponseError < ApplicationError; end
+class FetchRandomWordError < ResponseError; end
+
 class WordGuesserGame
 
   attr_accessor :word, :guesses, :wrong_guesses
@@ -10,7 +20,7 @@ class WordGuesserGame
 
   def guess(letter)
     if letter.nil? || letter !~ /\A[a-zA-Z]\Z/i # match single letter,ignoring case
-      raise ArgumentError
+      raise InvalidGuessError
     end
     letter = letter[0].downcase
     if  @word.include?(letter) && !@guesses.include?(letter)
@@ -44,7 +54,11 @@ class WordGuesserGame
     require 'uri'
     require 'net/http'
     uri = URI('http://randomword.saasbook.info/RandomWord')
-    Net::HTTP.post_form(uri ,{}).body
+    begin
+      Net::HTTP.post_form(uri ,{}).body
+    rescue StandardError => e
+      raise FetchRandomWordError, 'Error fetching random word'
+    end
   end
 
 end
